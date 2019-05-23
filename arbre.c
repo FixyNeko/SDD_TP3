@@ -59,7 +59,7 @@ int insertion(noeud_t ** arbre, char * mot) {
 	if(derniereLettre != NULL)
 		prec = &(derniereLettre->lv);
 
-	while(mot[i] != '\0' && ok) {
+	while(mot[i] != '\0' && mot[i] != '\n' && ok) {
 
 		ok = recherchePrec(prec, mot[i], &prec);
 		ok = insertionValeur(prec, mot[i]);
@@ -67,7 +67,7 @@ int insertion(noeud_t ** arbre, char * mot) {
 		prec = &((*prec)->lv);
 		++i;
 	}
-	printf("mot: %s, mot[i]: %c, derniereLettre->valeur: %c\n", mot, mot[i], (derniereLettre == NULL)? ' ': derniereLettre->donnee);
+
 	if( derniereLettre != NULL &&derniereLettre->donnee >= 'a' && derniereLettre->donnee <= 'z')
 		derniereLettre->donnee = toupper(derniereLettre->donnee);
 
