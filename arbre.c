@@ -7,6 +7,7 @@ noeud_t * creerNoeud(element_arbre valeur) {
 }
 
 int recherchePrec(noeud_t ** arbre, element_arbre valeur, noeud_t *** retour) {
+	// recherche d'un precedant dans une liste chainee, sans differencier les majuscules des minuscules dEEFD+
 	*retour = arbre;
 	noeud_t * cour = *arbre;
 
@@ -20,10 +21,11 @@ int recherchePrec(noeud_t ** arbre, element_arbre valeur, noeud_t *** retour) {
 int rechercheMotif(noeud_t ** arbre, char * motif, noeud_t ** derniereLettre) {
 	int i, lettreTrouvee;
 	noeud_t ** prec = arbre;
-	*derniereLettre = NULL;
+	*derniereLettre = NULL; // pointeur sur la derniere lettre commune entre l'arbre et le motif
 
 	i = 0;
-	do {
+	do { // on parcourt l'arbre tant que le motif entier n'a pas été trouvé et qu'on continue
+		// de trouver une correspondance dans l'arbre
 		lettreTrouvee = recherchePrec(prec, motif[i], &prec);
 		if(lettreTrouvee){
 			*derniereLettre = *prec;
@@ -36,6 +38,7 @@ int rechercheMotif(noeud_t ** arbre, char * motif, noeud_t ** derniereLettre) {
 }
 
 int insertionValeur(noeud_t ** prec, element_arbre valeur) {
+	// insertion d'une nouvelle valeur dans la liste chainée des lh d'un noeud d'un arbre
 	noeud_t * nouv = creerNoeud(valeur);
 	int ok = (nouv != NULL);
 
@@ -55,41 +58,44 @@ int insertion(noeud_t ** arbre, char * mot) {
 	noeud_t * derniereLettre = NULL;
 
 
-	i = rechercheMotif(arbre, mot, &derniereLettre);
-	if(derniereLettre != NULL)
+	i = rechercheMotif(arbre, mot, &derniereLettre); // on se place sur la derniere lettre commune
+													// entre le contenu de l'arbre et le mot à inserer
+	if(derniereLettre != NULL) // cas spécial si on doit créer une nouvelle racine
 		prec = &(derniereLettre->lv);
 
-	while(mot[i] != '\0' && mot[i] != '\n' && ok) {
-
-		ok = recherchePrec(prec, mot[i], &prec);
-		ok = insertionValeur(prec, mot[i]);
+	while(mot[i] != '\0' && mot[i] != '\n' && ok) { // toutes les lettres suivantes dans le mot
+													// sont à inserer dans l'arbre
+		ok = recherchePrec(prec, mot[i], &prec); // on recherche l'endroit où inserer une lettre en respectant l'alphabet
+		ok = insertionValeur(prec, mot[i]); // on insere la lettre au bon endroit de l'arbre
 		derniereLettre = *prec;
 		prec = &((*prec)->lv);
 		++i;
 	}
 
-	if( derniereLettre != NULL &&derniereLettre->donnee >= 'a' && derniereLettre->donnee <= 'z')
-		derniereLettre->donnee = toupper(derniereLettre->donnee);
+	if( derniereLettre != NULL && derniereLettre->donnee >= 'a' && derniereLettre->donnee <= 'z')
+		derniereLettre->donnee = toupper(derniereLettre->donnee); // on met la derniere lettre en majuscule
 
-	return ok; // retourne si l'operation s'est bien passée
+	return ok; // retourne si l'operation s'est bien passéeS
 }
 
 void affichageMots(noeud_t ** racine) {
-	int i;
-	pile_t * pile = InitPile(100);
-	noeud_t * copie[100];
-	int tailleCopie;
+	int i; // compteur boucles
+	pile_t * pile = InitPile(100); // pile de noeuds
+	noeud_t * copie[100]; // copie de la pile pour l'affichage des lettres d'un mot
+	int tailleCopie; // nombrede noeuds de la copie
 
-	noeud_t * cour = *racine;
+	noeud_t * cour = *racine; // variable de parcours de l'arbre
 
-	while(cour != NULL || !PILEEstVide(pile)) {
+	while(cour != NULL || !PILEEstVide(pile)) { // on faitun parcour en profondeur de l'arbre
 		while(cour != NULL) {
 			PILEempiler(pile, cour);
 
-			if(cour->donnee >= 'A' && cour->donnee <= 'Z') {
-				tailleCopie = copiePile(pile, copie);
+			if(cour->donnee >= 'A' && cour->donnee <= 'Z') { // la lettre venant d'être empilée
+															// marque la fin d'un mot, on affiche
+															// donc le mot
+				tailleCopie = copiePile(pile, copie); // on copie la pile des noeuds pour pouvoir afficher leurs lettres
 
-				for(i = 0; i < tailleCopie; i++) {
+				for(i = 0; i < tailleCopie; i++) { // on affiche la lettre de tous les noeuds encommencant par la racine
 					printf(FORMAT_ARBRE, tolower(copie[i]->donnee));
 				}
 				printf("\n");
@@ -105,7 +111,51 @@ void affichageMots(noeud_t ** racine) {
 	}
 }
 
-void affichage(noeud_t * racine, char * parentTreeText, int parentTreeTextEnd, int propagateParent) {
+void affichageMotif(noeud_t ** racine, char * motif) {
+	int tailleMotif = 0;
+	pile_t * pile = InitPile(100);
+	noeud_t * derniereLettre;
+	noeud_t * cour;
+	noeud_t * copie[100];
+	int tailleCopie;
+	int i;
+
+	while(motif[tailleMotif] != '\0') tailleMotif++;
+
+	int tailleRecherche = rechercheMotif(racine, motif , &derniereLettre);
+	cour = derniereLettre;
+
+	if(tailleMotif == tailleRecherche) { // le motif a bien été trouvé
+		if(isupper(derniereLettre->donnee))
+			printf("%s\n", motif); // le motif trouv" termine par une majuscule, c'est donc un mot du dictionnaire
+
+		while(cour != NULL || !PILEEstVide(pile)) { // on parcours l'arbre en profondeur pour afficher les mots
+			while(cour != NULL) {
+				PILEempiler(pile, cour);
+
+				if(cour->donnee >= 'A' && cour->donnee <= 'Z') {
+					tailleCopie = copiePile(pile, copie);
+
+					printf("%s", motif); // la pile ne contient pas le motif, on l'ajoute manuellement
+
+					for(i = 0; i < tailleCopie; i++) {
+						printf(FORMAT_ARBRE, tolower(copie[i]->donnee)); // on affiche la suite du mot
+					}
+					printf("\n");
+				}
+
+				cour = cour->lv;
+			}
+			while(cour == NULL && !PILEEstVide(pile)) {
+				PILEdepiler(pile, &cour);
+			}
+			if(cour != NULL)
+				cour = cour->lh;
+		}
+	}
+}
+
+void affichageArbre(noeud_t * racine, char * parentTreeText, int parentTreeTextEnd, int propagateParent) {
 
 	if(propagateParent) {
 		parentTreeText[parentTreeTextEnd++] = '|';
@@ -130,7 +180,7 @@ void affichage(noeud_t * racine, char * parentTreeText, int parentTreeTextEnd, i
 		printf(FORMAT_ARBRE, racine->donnee);
 		printf("\n");
 
-		affichage(racine->lv, parentTreeText, parentTreeTextEnd, propagateParent);
+		affichageArbre(racine->lv, parentTreeText, parentTreeTextEnd, propagateParent);
 
 		racine = racine->lh;
 	}
@@ -139,3 +189,5 @@ void affichage(noeud_t * racine, char * parentTreeText, int parentTreeTextEnd, i
 	parentTreeText[parentTreeTextEnd] = '\0';
 
 }
+
+//int isupper(char c) { return c >= 'A' && c <= 'Z';}

@@ -15,6 +15,8 @@ typedef struct noeud {
 
 #include "pile.h"
 
+//int isupper(char c);
+
 noeud_t *	creerNoeud(element_arbre valeur);
 int			recherchePrec(noeud_t ** arbre, element_arbre valeur, noeud_t *** retour);
 int			insertionValeur(noeud_t ** prec, element_arbre valeur);
@@ -23,8 +25,9 @@ int 		rechercheMotif(noeud_t ** arbre, char * motif, noeud_t ** derniereLettre);
 
 int			insertion(noeud_t ** racine, char * mot);
 void		affichageMots(noeud_t ** racine);
+void		affichageMotif(noeud_t ** racine, char * motif);
 
-void		affichage(noeud_t * racine, char * parentTreeText, int parentTreeTextEnd, int propagateParent);
+void		affichageArbre(noeud_t * racine, char * parentTreeText, int parentTreeTextEnd, int propagateParent);
 
 
 
