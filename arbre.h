@@ -19,10 +19,10 @@ typedef struct noeud {
 //int isupper(char c);
 
 noeud_t *	creerNoeud(element_arbre valeur);
-int			recherchePrec(noeud_t ** arbre, element_arbre valeur, noeud_t *** retour);
+int			recherchePrec(noeud_t ** noeud, element_arbre valeur, noeud_t *** retour);
 int			insertionValeur(noeud_t ** prec, element_arbre valeur);
 
-int 		rechercheMotif(noeud_t ** arbre, char * motif, noeud_t ** derniereLettre);
+int 		rechercheMotif(noeud_t ** arbre, element_arbre * motif, noeud_t ** derniereLettre);
 
 int			insertion(noeud_t ** racine, char * mot);
 void		affichageMots(noeud_t ** racine);

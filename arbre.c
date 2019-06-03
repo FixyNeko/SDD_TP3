@@ -1,15 +1,30 @@
 #include "arbre.h"
 
+
+/*	creerNoeud
+	Entrée: la valeur qu'on veut mettre dans le nouvel elément créé
+	Sortie: un noeud c'éé et initialisé
+*/
+
 noeud_t * creerNoeud(element_arbre valeur) {
 	noeud_t * noeud = (noeud_t *) malloc(sizeof(noeud_t));
 	noeud->donnee = valeur;
+	noeud->lh = NULL;
+	noeud->lv = NULL;
 	return noeud;
 }
 
-int recherchePrec(noeud_t ** arbre, element_arbre valeur, noeud_t *** retour) {
-	// recherche d'un precedant dans une liste chainee, sans differencier les majuscules des minuscules dEEFD+
-	*retour = arbre;
-	noeud_t * cour = *arbre;
+/*	recherchePrec
+	Entrée: un noeud servant de premier élément de recherche dans la liste chainée lh
+			une valeur à chercher
+	Sortie: la position d'un élément contenant la valeur cherchée, ou l'emplacement où elle devrait être
+			si l'élement est présent ou non dans la liste chainée lh
+*/
+
+int recherchePrec(noeud_t ** noeud, element_arbre valeur, noeud_t *** retour) {
+	// recherche d'un precedant dans une liste chainee, sans differencier les majuscules des minuscules
+	*retour = noeud;
+	noeud_t * cour = *noeud;
 
 	while(cour != NULL && tolower(cour->donnee) < tolower(valeur)) {
 		*retour = &(cour->lh);
@@ -18,9 +33,16 @@ int recherchePrec(noeud_t ** arbre, element_arbre valeur, noeud_t *** retour) {
 	return (cour != NULL && tolower(cour->donnee) == tolower(valeur));
 }
 
-int rechercheMotif(noeud_t ** arbre, char * motif, noeud_t ** derniereLettre) {
+/*	rechercheMotif
+	Entrée: une racine à partir de laquelle chercher le motif
+			un motif à chercher
+	Sortie: la longueur du motif trouvé. Si on n'a trouvé que les 2 premiers éléments du motif, renvoie 2
+			un pointeur sur le dernier élément commun entre l'arbre et le motif
+*/
+
+int rechercheMotif(noeud_t ** racine, element_arbre * motif, noeud_t ** derniereLettre) {
 	int i, lettreTrouvee;
-	noeud_t ** prec = arbre;
+	noeud_t ** prec = racine;
 	*derniereLettre = NULL; // pointeur sur la derniere lettre commune entre l'arbre et le motif
 
 	i = 0;
@@ -37,18 +59,30 @@ int rechercheMotif(noeud_t ** arbre, char * motif, noeud_t ** derniereLettre) {
 	return i;
 }
 
+/*	insertionValeur
+	Entrée: prec l'adresse du pointeur après lequel insérer une nouvelle valeur
+			valeur la nouvelle valeur à insérer
+	Sortie: si l'opération s'est bien passée
+*/
+
 int insertionValeur(noeud_t ** prec, element_arbre valeur) {
 	// insertion d'une nouvelle valeur dans la liste chainée des lh d'un noeud d'un arbre
 	noeud_t * nouv = creerNoeud(valeur);
 	int ok = (nouv != NULL);
 
-	if(ok) {
+	if(ok) { // on insère seulement si l'allocation s'est bien passée
 		nouv->lh = *prec;
 		*prec = nouv;
 	}
 
 	return ok;
 }
+
+/*	insertion
+	Entrée: une racine à partir de laquelle insérer un nouveau mot dans l'arbre
+			un mot à insérer
+	Sortie: si le mot a bien été inséré
+*/
 
 int insertion(noeud_t ** arbre, char * mot) {
 	int i;
@@ -113,6 +147,12 @@ void affichageMots(noeud_t ** racine) {
 	PILEliberer(pile);
 }
 
+/* affichageMotif
+	affiche tous les mots commencant par un motif à partir d'une racine
+	Entree: une racine à partir de laquelle commencer la recherche du motif
+			un motif à rechercher
+*/
+
 void affichageMotif(noeud_t ** racine, char * motif) {
 	int tailleMotif = 0;
 	pile_t * pile = InitPile(100);
@@ -163,6 +203,14 @@ void affichageMotif(noeud_t ** racine, char * motif) {
 	PILEliberer(pile);
 }
 
+/*	affichageArbre
+	Entrée: une racine d'un arbre
+			une chaine de caracteres servant à l'affichage (fonction recursive, peut mieux faire)
+			sa longueur
+			une variable servant à savoir si on a atteint le dernier element fils d'un noeud, pour afficher des coudes
+	Sortie: un joli affichage d'un arbre, du style de la commande tree
+*/
+
 void affichageArbre(noeud_t * racine, char * parentTreeText, int parentTreeTextEnd, int propagateParent) {
 
 	if(propagateParent) {
@@ -198,13 +246,17 @@ void affichageArbre(noeud_t * racine, char * parentTreeText, int parentTreeTextE
 
 }
 
+/* libererArbre
+	Entrée: une racine d'un arbre à supprimer de la mémoire
+*/
+
 void libererArbre(noeud_t * racine) {
 	pile_t * pile = InitPile(100); // pile de noeuds
 
 	noeud_t * cour = racine; // variable de parcours de l'arbre
 	noeud_t * prec;
 
-	while(cour != NULL || !PILEEstVide(pile)) { // on faitun parcour en profondeur de l'arbre
+	while(cour != NULL || !PILEEstVide(pile)) { // on fait un parcour en profondeur de l'arbre
 		while(cour != NULL) {
 			PILEempiler(pile, cour);
 
@@ -215,8 +267,9 @@ void libererArbre(noeud_t * racine) {
 		}
 		if(cour != NULL) {
 			prec = cour;
-			free(prec);
 			cour = cour->lh;
+			free(prec); // on libere l'element courant une fois qu'on l'a parcouru et qu'il a été
+						// dépilé, cad quand on sait qu'il ne sera plus jamais utilisé
 		}
 	}
 

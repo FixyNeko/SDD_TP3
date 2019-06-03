@@ -1,9 +1,10 @@
 #include "arbre.h"
 #include "stdio.h"
 
-#define FICHIER_TEST "./tests/testVide.txt"
+#define FICHIER_TEST "./tests/test1.txt"
 
-int main(int argc, char * argv[]) {
+int main() {
+	char s[100] = {0};
 
 	noeud_t * racine = NULL;
 
@@ -25,13 +26,9 @@ int main(int argc, char * argv[]) {
 	//////////////// fin de lecture du fichier de test ///////////////
 
 
-	char s[100] = {0};
-	affichageArbre(racine, s, 0, 1); // fonction d'affichage de l'arbre pour le debugage
+	affichageArbre(racine, s, 0, 1); // fonction d'affichage de l'arbre pour le debugage, remplace ddd
 
-
-	//affichageMots(&racine); // affichage de tous les mots de l'arbre
-
-	affichageMotif(&racine, "abc");
+	affichageMotif(&racine, "");
 
 	libererArbre(racine);
 
