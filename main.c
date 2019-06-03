@@ -1,7 +1,7 @@
 #include "arbre.h"
 #include "stdio.h"
 
-#define FICHIER_TEST "./tests/test1.txt"
+#define FICHIER_TEST "./tests/testVide.txt"
 
 int main(int argc, char * argv[]) {
 
@@ -17,7 +17,7 @@ int main(int argc, char * argv[]) {
 	else {
 		while(!feof(f)) { // tant qu'il reste des lignes à lire
 			if ( fgets(buffer , 100 , f) != NULL ) // s'il n'y a pas d'erreur de lecture
-				insertion(&racine, buffer); // on insere le couple cle;valeur dans l'arbre
+				insertion(&racine, buffer); // on insere le mote dans l'arbre
 		}
 		fclose(f);
 	}
@@ -31,7 +31,9 @@ int main(int argc, char * argv[]) {
 
 	//affichageMots(&racine); // affichage de tous les mots de l'arbre
 
-	affichageMotif(&racine, "abcd");
+	affichageMotif(&racine, "abc");
+
+	libererArbre(racine);
 
 	return 0;
 }

@@ -109,6 +109,8 @@ void affichageMots(noeud_t ** racine) {
 		if(cour != NULL)
 			cour = cour->lh;
 	}
+
+	PILEliberer(pile);
 }
 
 void affichageMotif(noeud_t ** racine, char * motif) {
@@ -123,11 +125,15 @@ void affichageMotif(noeud_t ** racine, char * motif) {
 	while(motif[tailleMotif] != '\0') tailleMotif++;
 
 	int tailleRecherche = rechercheMotif(racine, motif , &derniereLettre);
-	cour = derniereLettre;
+	if(derniereLettre == NULL)
+		cour = *racine;
+	else
+		cour = derniereLettre->lv; // on veut parcourir les lettres suivant le motif dans l'arbre
 
 	if(tailleMotif == tailleRecherche) { // le motif a bien été trouvé
-		if(isupper(derniereLettre->donnee))
-			printf("%s\n", motif); // le motif trouv" termine par une majuscule, c'est donc un mot du dictionnaire
+
+		if(cour == NULL) // cas spécial dans le cas où le motif cherché n'aurait aucun fils dans l'arbre
+			printf("%s\n", motif);
 
 		while(cour != NULL || !PILEEstVide(pile)) { // on parcours l'arbre en profondeur pour afficher les mots
 			while(cour != NULL) {
@@ -153,6 +159,8 @@ void affichageMotif(noeud_t ** racine, char * motif) {
 				cour = cour->lh;
 		}
 	}
+
+	PILEliberer(pile);
 }
 
 void affichageArbre(noeud_t * racine, char * parentTreeText, int parentTreeTextEnd, int propagateParent) {
@@ -190,4 +198,27 @@ void affichageArbre(noeud_t * racine, char * parentTreeText, int parentTreeTextE
 
 }
 
-//int isupper(char c) { return c >= 'A' && c <= 'Z';}
+void libererArbre(noeud_t * racine) {
+	pile_t * pile = InitPile(100); // pile de noeuds
+
+	noeud_t * cour = racine; // variable de parcours de l'arbre
+	noeud_t * prec;
+
+	while(cour != NULL || !PILEEstVide(pile)) { // on faitun parcour en profondeur de l'arbre
+		while(cour != NULL) {
+			PILEempiler(pile, cour);
+
+			cour = cour->lv;
+		}
+		while(cour == NULL && !PILEEstVide(pile)) {
+			PILEdepiler(pile, &cour);
+		}
+		if(cour != NULL) {
+			prec = cour;
+			free(prec);
+			cour = cour->lh;
+		}
+	}
+
+	PILEliberer(pile);
+}

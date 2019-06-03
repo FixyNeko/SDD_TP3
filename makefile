@@ -1,6 +1,6 @@
-CFLAGS=-Wall -Wextra -pedantic -g -Wno-implicit-function-declaration -Wno-unused-parameter
+CFLAGS=-Wall -Wextra -pedantic -g
 
-SOURCES = pile.c main.c file.c arbre.c
+SOURCES = pile.c main.c arbre.c
 
 all: $(SOURCES)
 	gcc $(CFLAGS) $^ -o main

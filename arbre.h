@@ -4,7 +4,8 @@
 #define FORMAT_ARBRE "%c"
 typedef char element_arbre;
 
-#include "file.h"
+#include <stdio.h>
+#include <ctype.h>
 #include "listeChainee.h"
 
 typedef struct noeud {
@@ -29,6 +30,7 @@ void		affichageMotif(noeud_t ** racine, char * motif);
 
 void		affichageArbre(noeud_t * racine, char * parentTreeText, int parentTreeTextEnd, int propagateParent);
 
+void		libererArbre(noeud_t * racine);
 
 
 #endif // ARBRE_H
